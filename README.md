@@ -1,5 +1,5 @@
-# Blink Example
+# Interrupt Example
 
-Starts a FreeRTOS task to blink an LED
+registers an interrupt on pin 35 and outputs a short pulse on pin 5
 
-See the README.md file in the upper level 'examples' directory for more information about examples.
+Also starts a FreeRTOS task to blink an LED
