@@ -11,6 +11,7 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "sdkconfig.h"
+#include "esp_ipc.h"
 
 /* Can use project configuration menu (idf.py menuconfig) to choose the GPIO to blink,
    or you can edit the following line and set a number here.
@@ -23,15 +24,21 @@ void IRAM_ATTR DigitalInterrupt(void *arg)
     gpio_set_level((gpio_num_t)5, false);
 }
 
-void app_main(void)
+void IRAM_ATTR gpio_install_isr_service_cb() 
 {
     gpio_set_direction((gpio_num_t)5, GPIO_MODE_OUTPUT);
-
+    
     gpio_install_isr_service(ESP_INTR_FLAG_LEVEL3 | ESP_INTR_FLAG_IRAM);
     gpio_set_direction((gpio_num_t)35, GPIO_MODE_INPUT);
     gpio_set_intr_type((gpio_num_t)35, GPIO_INTR_ANYEDGE);
     gpio_intr_enable((gpio_num_t)35);
     gpio_isr_handler_add((gpio_num_t)35, DigitalInterrupt, 0);
+}
+
+void app_main(void)
+{
+
+    esp_ipc_call_blocking(1, gpio_install_isr_service_cb, NULL);
 
     /* Configure the IOMUX register for pad BLINK_GPIO (some pads are
        muxed to GPIO on reset already, but some default to other
